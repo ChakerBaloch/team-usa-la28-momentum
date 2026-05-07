@@ -1,0 +1,16 @@
+node_modules
+dist
+.DS_Store
+*.log
+# Keep local secrets out of git.
+.env
+.env.*
+!.env.example
+/server/.env
+/server/.env.*
+!/server/.env.example
+/client/.env
+/client/.env.*
+!/client/.env.example
+coverage
+client/.vite

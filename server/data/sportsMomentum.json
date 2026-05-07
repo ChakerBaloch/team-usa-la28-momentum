@@ -1,0 +1,181 @@
+{
+  "datasetLabel": "curated public-data-inspired demo dataset",
+  "sports": [
+    {
+      "id": "swimming",
+      "sport": "Swimming",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 12,
+      "recentHeadlineCount": 4,
+      "growthSignalCount": 3,
+      "momentumSignals": [
+        "Strong international visibility",
+        "Consistent Team USA depth",
+        "High fan recognition"
+      ],
+      "recentNewsSummaries": [
+        "Team USA swimming has remained highly visible in major international competition coverage.",
+        "Emerging athletes could add new storylines before LA28 without changing the program's established fan base."
+      ],
+      "sourceNotes": [
+        "Public Team USA and international competition coverage",
+        "Curated MVP dataset for hackathon demo"
+      ]
+    },
+    {
+      "id": "gymnastics",
+      "sport": "Gymnastics",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 10,
+      "recentHeadlineCount": 5,
+      "growthSignalCount": 3,
+      "momentumSignals": [
+        "Strong media attention cycle",
+        "Deep fan familiarity",
+        "Routine-by-routine storytelling appeal"
+      ],
+      "recentNewsSummaries": [
+        "Gymnastics continues to draw strong attention around major meets and athlete development storylines.",
+        "Ongoing interest in returning veterans and rising talent could keep fan momentum elevated through LA28."
+      ],
+      "sourceNotes": [
+        "Public Team USA and international gymnastics coverage",
+        "Curated MVP dataset for hackathon demo"
+      ]
+    },
+    {
+      "id": "athletics",
+      "sport": "Athletics",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 11,
+      "recentHeadlineCount": 4,
+      "growthSignalCount": 4,
+      "momentumSignals": [
+        "Broad event-by-event depth",
+        "Year-round visibility across sprint and field disciplines",
+        "Strong crossover fan interest"
+      ],
+      "recentNewsSummaries": [
+        "Athletics remains one of the most visible Olympic categories in global competition coverage.",
+        "A wide mix of events may help sustain interest as multiple athlete storylines build toward LA28."
+      ],
+      "sourceNotes": [
+        "Public Team USA and global track-and-field coverage",
+        "Curated MVP dataset for hackathon demo"
+      ]
+    },
+    {
+      "id": "skateboarding",
+      "sport": "Skateboarding",
+      "category": "Olympic",
+      "la28Status": "Youth-driving LA28 sport",
+      "worldChampionshipCount": 4,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 5,
+      "momentumSignals": [
+        "Younger audience appeal",
+        "Culture-driven social media visibility",
+        "Growth upside ahead of LA28"
+      ],
+      "recentNewsSummaries": [
+        "Skateboarding continues to attract attention through youth culture, digital highlights, and global event clips.",
+        "Its newer Olympic identity may keep it in fan conversations as LA28 approaches."
+      ],
+      "sourceNotes": [
+        "Public Olympic and action-sport coverage",
+        "Curated MVP dataset for hackathon demo"
+      ]
+    },
+    {
+      "id": "para-swimming",
+      "sport": "Para Swimming",
+      "category": "Paralympic",
+      "la28Status": "Featured LA28 Paralympic sport",
+      "worldChampionshipCount": 10,
+      "recentHeadlineCount": 4,
+      "growthSignalCount": 4,
+      "momentumSignals": [
+        "Strong medal-event visibility",
+        "Reliable Team USA depth",
+        "Expanding fan storytelling potential"
+      ],
+      "recentNewsSummaries": [
+        "Para swimming remains one of the most visible Paralympic sports in international reporting and recap coverage.",
+        "A steady stream of athlete development stories may keep fan interest growing ahead of LA28."
+      ],
+      "sourceNotes": [
+        "Public Team USA Paralympic and international para swimming coverage",
+        "Curated MVP dataset for hackathon demo"
+      ]
+    },
+    {
+      "id": "wheelchair-basketball",
+      "sport": "Wheelchair Basketball",
+      "category": "Paralympic",
+      "la28Status": "Featured LA28 Paralympic sport",
+      "worldChampionshipCount": 8,
+      "recentHeadlineCount": 4,
+      "growthSignalCount": 5,
+      "momentumSignals": [
+        "Strong team-sport drama",
+        "Accessible game flow for new fans",
+        "Growing recognition in multi-sport coverage"
+      ],
+      "recentNewsSummaries": [
+        "Wheelchair basketball continues to benefit from the familiarity of a widely understood team-sport format.",
+        "Competitive parity and strong visual pacing could help more casual fans stay engaged before LA28."
+      ],
+      "sourceNotes": [
+        "Public Team USA Paralympic and international wheelchair basketball coverage",
+        "Curated MVP dataset for hackathon demo"
+      ]
+    },
+    {
+      "id": "para-athletics",
+      "sport": "Para Athletics",
+      "category": "Paralympic",
+      "la28Status": "Featured LA28 Paralympic sport",
+      "worldChampionshipCount": 12,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 4,
+      "momentumSignals": [
+        "Wide event diversity",
+        "Large storytelling surface across classifications",
+        "Strong international relevance"
+      ],
+      "recentNewsSummaries": [
+        "Para athletics remains central to major Paralympic competition coverage because of its breadth and visibility.",
+        "Multiple event formats and athlete pathways could keep momentum broad rather than concentrated in one storyline."
+      ],
+      "sourceNotes": [
+        "Public Team USA Paralympic and world para athletics coverage",
+        "Curated MVP dataset for hackathon demo"
+      ]
+    },
+    {
+      "id": "sitting-volleyball",
+      "sport": "Sitting Volleyball",
+      "category": "Paralympic",
+      "la28Status": "Featured LA28 Paralympic sport",
+      "worldChampionshipCount": 7,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 4,
+      "momentumSignals": [
+        "Strong team identity",
+        "Clear match drama for spectators",
+        "Steady fan engagement upside"
+      ],
+      "recentNewsSummaries": [
+        "Sitting volleyball continues to earn attention through its pace, teamwork, and repeat fan familiarity.",
+        "Team-based rivalries and recognizable match momentum may help the sport stay visible on the road to LA28."
+      ],
+      "sourceNotes": [
+        "Public Team USA Paralympic and international sitting volleyball coverage",
+        "Curated MVP dataset for hackathon demo"
+      ]
+    }
+  ]
+}
