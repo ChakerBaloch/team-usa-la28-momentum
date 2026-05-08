@@ -8,20 +8,98 @@
       "la28Status": "Featured LA28 sport",
       "worldChampionshipCount": 12,
       "recentHeadlineCount": 4,
-      "growthSignalCount": 3,
-      "momentumSignals": [
-        "Strong international visibility",
-        "Consistent Team USA depth",
-        "High fan recognition"
+      "growthSignalCount": 5,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["7 world records in 2025", "Rebuilt coaching staff", "Deep age-group pipeline"],
+      "recentNewsSummaries": ["7 world records posted in 2025 — highest output in a decade.", "Rebuilt coaching staff and new training center could accelerate momentum toward LA28."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [14,11,13,15,16,18] },
+      "newsArticles": [
+        { "headline": "Team USA posts 7 world records in 2025", "recencyWeight": 1.0 },
+        { "headline": "Coaching rebuild targets LA28 peak", "recencyWeight": 0.95 },
+        { "headline": "Junior swimmers show depth at US Championships", "recencyWeight": 0.88 }
       ],
-      "recentNewsSummaries": [
-        "Team USA swimming has remained highly visible in major international competition coverage.",
-        "Emerging athletes could add new storylines before LA28 without changing the program's established fan base."
+      "pipeline": { "juniorAthletesApprox": 72, "qualificationSlotsEarned": 18, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public Team USA and international competition coverage"]
+    },
+    {
+      "id": "athletics",
+      "sport": "Track & Field",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 11,
+      "recentHeadlineCount": 4,
+      "growthSignalCount": 4,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Sprint + throws depth", "World champs dominance", "Year-round visibility"],
+      "recentNewsSummaries": ["Multi-discipline dominance at recent world championships.", "Throws and jumps programs reportedly deepest in a generation."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [22,18,20,24,23,25] },
+      "newsArticles": [
+        { "headline": "USA dominates throws and jumps at world indoors", "recencyWeight": 1.0 },
+        { "headline": "Sprint pipeline producing sub-10 athletes at record pace", "recencyWeight": 0.9 },
+        { "headline": "US throws investment paying off ahead of LA28", "recencyWeight": 0.8 }
       ],
-      "sourceNotes": [
-        "Public Team USA and international competition coverage",
-        "Curated MVP dataset for hackathon demo"
-      ]
+      "pipeline": { "juniorAthletesApprox": 110, "qualificationSlotsEarned": 24, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public global track-and-field coverage"]
+    },
+    {
+      "id": "flag",
+      "sport": "Flag Football",
+      "category": "Olympic",
+      "la28Status": "Olympic debut at LA28",
+      "worldChampionshipCount": 3,
+      "recentHeadlineCount": 5,
+      "growthSignalCount": 5,
+      "isNewOlympicSport": true,
+      "momentumSignals": ["World #1 ranking", "NFL infrastructure backing", "Massive youth base"],
+      "recentNewsSummaries": ["NFL announces formal LA28 partnership.", "USA wins IFAF World Championship with record margin."],
+      "trajectory": { "years": [2021,2022,2023,2024,2025], "medalCounts": [2,3,3,4,4] },
+      "newsArticles": [
+        { "headline": "NFL backs Team USA flag football at LA28", "recencyWeight": 1.0 },
+        { "headline": "USA wins IFAF World Championship by record margin", "recencyWeight": 0.98 },
+        { "headline": "20 million youth flag football players in the US", "recencyWeight": 0.85 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 200, "qualificationSlotsEarned": 6, "youthProgramExpansion": true, "isNewOlympicSport": true },
+      "sourceNotes": ["Public IFAF and NFL coverage"]
+    },
+    {
+      "id": "basketball",
+      "sport": "Basketball",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 10,
+      "recentHeadlineCount": 5,
+      "growthSignalCount": 4,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["NBA stars committed to LA28", "3x3 program also competing", "Home-city advantage"],
+      "recentNewsSummaries": ["Multiple NBA stars have expressed intent to compete at LA28.", "Team USA basketball is one of the most-followed Olympic programs globally."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [8,9,8,9,10,10] },
+      "newsArticles": [
+        { "headline": "NBA stars commit to LA28 Olympic roster", "recencyWeight": 1.0 },
+        { "headline": "Team USA wins FIBA World Cup to reclaim world #1", "recencyWeight": 0.92 },
+        { "headline": "3x3 program expands with strong domestic circuit", "recencyWeight": 0.82 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 85, "qualificationSlotsEarned": 12, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public NBA and FIBA coverage"]
+    },
+    {
+      "id": "womens-soccer",
+      "sport": "Women's Soccer",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 9,
+      "recentHeadlineCount": 4,
+      "growthSignalCount": 4,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["NWSL growth fueling talent", "Home-Games momentum", "Young roster building"],
+      "recentNewsSummaries": ["NWSL record viewership is building a deeper talent pipeline for Team USA.", "A young and reconstructing USWNT could peak at a home Olympics."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [9,8,7,8,8,9] },
+      "newsArticles": [
+        { "headline": "NWSL hits record viewership boosting USWNT pipeline", "recencyWeight": 1.0 },
+        { "headline": "Young USWNT roster shows promise in 2025 friendlies", "recencyWeight": 0.93 },
+        { "headline": "USWNT targets LA28 gold on home soil", "recencyWeight": 0.85 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 95, "qualificationSlotsEarned": 16, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public NWSL and US Soccer coverage"]
     },
     {
       "id": "gymnastics",
@@ -29,65 +107,239 @@
       "category": "Olympic",
       "la28Status": "Featured LA28 sport",
       "worldChampionshipCount": 10,
-      "recentHeadlineCount": 5,
-      "growthSignalCount": 3,
-      "momentumSignals": [
-        "Strong media attention cycle",
-        "Deep fan familiarity",
-        "Routine-by-routine storytelling appeal"
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 4,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Next-gen wave emerging", "Post-Paris coaching rebuild", "Deep junior pipeline"],
+      "recentNewsSummaries": ["Next generation making strong showings at junior level.", "Post-Paris coaching changes may reshape trajectory."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [12,14,11,10,9,10] },
+      "newsArticles": [
+        { "headline": "Next-gen USA gymnasts making waves at junior level", "recencyWeight": 1.0 },
+        { "headline": "Post-Paris coaching changes could reshape program", "recencyWeight": 0.9 },
+        { "headline": "Junior participation surges after Paris Games", "recencyWeight": 0.82 }
       ],
-      "recentNewsSummaries": [
-        "Gymnastics continues to draw strong attention around major meets and athlete development storylines.",
-        "Ongoing interest in returning veterans and rising talent could keep fan momentum elevated through LA28."
-      ],
-      "sourceNotes": [
-        "Public Team USA and international gymnastics coverage",
-        "Curated MVP dataset for hackathon demo"
-      ]
+      "pipeline": { "juniorAthletesApprox": 55, "qualificationSlotsEarned": 10, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public USA Gymnastics coverage"]
     },
     {
-      "id": "athletics",
-      "sport": "Athletics",
+      "id": "shooting",
+      "sport": "Shooting",
       "category": "Olympic",
       "la28Status": "Featured LA28 sport",
-      "worldChampionshipCount": 11,
+      "worldChampionshipCount": 10,
       "recentHeadlineCount": 4,
-      "growthSignalCount": 4,
-      "momentumSignals": [
-        "Broad event-by-event depth",
-        "Year-round visibility across sprint and field disciplines",
-        "Strong crossover fan interest"
+      "growthSignalCount": 3,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["46 intl medals in 2025", "2 world champion titles", "Strong para parallel program"],
+      "recentNewsSummaries": ["USA Shooting posted 46 international medals in 2025.", "Two world champion titles added in current cycle."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [8,7,9,10,11,13] },
+      "newsArticles": [
+        { "headline": "USA Shooting records 46 international medals in 2025", "recencyWeight": 1.0 },
+        { "headline": "Two USA athletes crowned world champions", "recencyWeight": 0.92 },
+        { "headline": "Para shooting earns three more LA28 quota spots", "recencyWeight": 0.82 }
       ],
-      "recentNewsSummaries": [
-        "Athletics remains one of the most visible Olympic categories in global competition coverage.",
-        "A wide mix of events may help sustain interest as multiple athlete storylines build toward LA28."
+      "pipeline": { "juniorAthletesApprox": 45, "qualificationSlotsEarned": 14, "youthProgramExpansion": false, "isNewOlympicSport": false },
+      "sourceNotes": ["Public USA Shooting and ISSF coverage"]
+    },
+    {
+      "id": "tennis",
+      "sport": "Tennis",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 7,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 3,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Multiple top-10 players", "Pickleball crossover interest", "Home hard-court advantage"],
+      "recentNewsSummaries": ["Multiple Americans sit in the ATP/WTA top 10 entering the LA28 cycle.", "Hard-court conditions in LA could favor the US program."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [3,4,3,4,5,5] },
+      "newsArticles": [
+        { "headline": "USA has multiple top-10 players heading into LA28 cycle", "recencyWeight": 1.0 },
+        { "headline": "Hard-court advantage expected for Team USA at LA28", "recencyWeight": 0.88 },
+        { "headline": "Younger Americans rising through ATP and WTA rankings", "recencyWeight": 0.8 }
       ],
-      "sourceNotes": [
-        "Public Team USA and global track-and-field coverage",
-        "Curated MVP dataset for hackathon demo"
-      ]
+      "pipeline": { "juniorAthletesApprox": 40, "qualificationSlotsEarned": 8, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public ATP/WTA coverage"]
+    },
+    {
+      "id": "volleyball",
+      "sport": "Volleyball",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 6,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 3,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Beach and indoor both competitive", "Strong collegiate pipeline", "Home crowd advantage"],
+      "recentNewsSummaries": ["USA fields competitive teams in both beach and indoor disciplines.", "Beach volleyball home crowd advantage at LA28 could be significant."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [4,5,4,5,5,6] },
+      "newsArticles": [
+        { "headline": "USA beach volleyball pairs ranked in world top 5", "recencyWeight": 1.0 },
+        { "headline": "Indoor volleyball program rebuilding with young talent", "recencyWeight": 0.88 },
+        { "headline": "Collegiate pipeline producing world-class setters and attackers", "recencyWeight": 0.8 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 60, "qualificationSlotsEarned": 10, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public FIVB and USA Volleyball coverage"]
+    },
+    {
+      "id": "lacrosse",
+      "sport": "Lacrosse",
+      "category": "Olympic",
+      "la28Status": "Olympic debut at LA28",
+      "worldChampionshipCount": 5,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 5,
+      "isNewOlympicSport": true,
+      "momentumSignals": ["World #1 ranking", "Deep college pipeline", "Sixes format favors USA"],
+      "recentNewsSummaries": ["USA Lacrosse holds the world #1 ranking ahead of Olympic debut.", "Deep college pipeline provides unmatched talent base."],
+      "trajectory": { "years": [2021,2022,2023,2024,2025], "medalCounts": [3,3,4,4,5] },
+      "newsArticles": [
+        { "headline": "USA wins World Lacrosse Championship for third straight cycle", "recencyWeight": 1.0 },
+        { "headline": "College pipeline feeding record number of international athletes", "recencyWeight": 0.9 },
+        { "headline": "Olympic qualification pathway finalised for LA28", "recencyWeight": 0.82 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 90, "qualificationSlotsEarned": 6, "youthProgramExpansion": true, "isNewOlympicSport": true },
+      "sourceNotes": ["Public World Lacrosse and USA Lacrosse coverage"]
+    },
+    {
+      "id": "wrestling",
+      "sport": "Wrestling",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 8,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 3,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Consistent world championship medals", "Strong collegiate base", "Freestyle depth"],
+      "recentNewsSummaries": ["USA Wrestling continues to medal at world championships across freestyle categories.", "A deep collegiate wrestling base provides consistent talent supply."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [6,5,7,7,8,8] },
+      "newsArticles": [
+        { "headline": "USA Wrestling medals in multiple categories at worlds", "recencyWeight": 1.0 },
+        { "headline": "Collegiate wrestling record enrollment strengthens pipeline", "recencyWeight": 0.88 },
+        { "headline": "Freestyle program targets multiple LA28 gold medals", "recencyWeight": 0.8 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 65, "qualificationSlotsEarned": 12, "youthProgramExpansion": false, "isNewOlympicSport": false },
+      "sourceNotes": ["Public USA Wrestling and UWW coverage"]
+    },
+    {
+      "id": "cycling",
+      "sport": "Cycling",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 7,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 3,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Road, track and BMX represented", "Growing women's program", "WorldTour depth"],
+      "recentNewsSummaries": ["US road and track cycling programs both earned world championship medals.", "BMX racing and freestyle remain bright spots for the program."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [5,4,6,6,7,7] },
+      "newsArticles": [
+        { "headline": "US track cycling posts strong world championship results", "recencyWeight": 1.0 },
+        { "headline": "BMX racing and freestyle teams both targeting LA28 medals", "recencyWeight": 0.88 },
+        { "headline": "Women's road program sees new talent emerge", "recencyWeight": 0.8 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 50, "qualificationSlotsEarned": 10, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public USA Cycling and UCI coverage"]
     },
     {
       "id": "skateboarding",
       "sport": "Skateboarding",
       "category": "Olympic",
-      "la28Status": "Youth-driving LA28 sport",
+      "la28Status": "Featured LA28 sport",
       "worldChampionshipCount": 4,
       "recentHeadlineCount": 3,
       "growthSignalCount": 5,
-      "momentumSignals": [
-        "Younger audience appeal",
-        "Culture-driven social media visibility",
-        "Growth upside ahead of LA28"
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Culture-driven social visibility", "Younger audience appeal", "LA as global skate capital"],
+      "recentNewsSummaries": ["US skateboarding benefits from LA's position as the global capital of the sport.", "Young American skaters are consistently reaching World Skate podiums."],
+      "trajectory": { "years": [2021,2022,2023,2024,2025], "medalCounts": [3,3,4,4,5] },
+      "newsArticles": [
+        { "headline": "Young US skaters reaching World Skate podiums consistently", "recencyWeight": 1.0 },
+        { "headline": "LA's skate culture gives Team USA home-city edge at LA28", "recencyWeight": 0.9 },
+        { "headline": "Street and park programs both show strong US depth", "recencyWeight": 0.82 }
       ],
-      "recentNewsSummaries": [
-        "Skateboarding continues to attract attention through youth culture, digital highlights, and global event clips.",
-        "Its newer Olympic identity may keep it in fan conversations as LA28 approaches."
+      "pipeline": { "juniorAthletesApprox": 80, "qualificationSlotsEarned": 8, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public World Skate and Olympic coverage"]
+    },
+    {
+      "id": "golf",
+      "sport": "Golf",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 5,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 3,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Top-5 world rankings represented", "Men's and women's programs strong", "Major winners in the mix"],
+      "recentNewsSummaries": ["Multiple Americans sit in the top 5 of both world golf rankings.", "US golf programs are among the deepest globally at every level."],
+      "trajectory": { "years": [2021,2022,2023,2024,2025], "medalCounts": [2,3,3,3,4] },
+      "newsArticles": [
+        { "headline": "Multiple Americans in top 5 of world golf rankings", "recencyWeight": 1.0 },
+        { "headline": "US women's program posts multiple major wins in 2025", "recencyWeight": 0.9 },
+        { "headline": "Olympic golf format suits power hitters that dominate US tours", "recencyWeight": 0.8 }
       ],
-      "sourceNotes": [
-        "Public Olympic and action-sport coverage",
-        "Curated MVP dataset for hackathon demo"
-      ]
+      "pipeline": { "juniorAthletesApprox": 35, "qualificationSlotsEarned": 8, "youthProgramExpansion": false, "isNewOlympicSport": false },
+      "sourceNotes": ["Public PGA Tour and R&A coverage"]
+    },
+    {
+      "id": "sport-climbing",
+      "sport": "Sport Climbing",
+      "category": "Olympic",
+      "la28Status": "Featured LA28 sport",
+      "worldChampionshipCount": 4,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 4,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Youth participation surging", "Indoor gyms expanding nationwide", "World Cup circuit podiums"],
+      "recentNewsSummaries": ["American climbers have reached World Cup podiums in bouldering and lead.", "Indoor climbing gym growth is creating a wide youth pipeline."],
+      "trajectory": { "years": [2021,2022,2023,2024,2025], "medalCounts": [2,2,3,4,4] },
+      "newsArticles": [
+        { "headline": "US climbers reach World Cup podiums in bouldering and lead", "recencyWeight": 1.0 },
+        { "headline": "Indoor gym boom creates deep youth climbing pipeline", "recencyWeight": 0.9 },
+        { "headline": "Speed climbing program investing in infrastructure ahead of LA28", "recencyWeight": 0.82 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 55, "qualificationSlotsEarned": 6, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public IFSC and USA Climbing coverage"]
+    },
+    {
+      "id": "squash",
+      "sport": "Squash",
+      "category": "Olympic",
+      "la28Status": "Olympic debut at LA28",
+      "worldChampionshipCount": 2,
+      "recentHeadlineCount": 2,
+      "growthSignalCount": 3,
+      "isNewOlympicSport": true,
+      "momentumSignals": ["Olympic debut opportunity", "Growing domestic circuit", "World-ranked players in contention"],
+      "recentNewsSummaries": ["US squash players are climbing world rankings ahead of the Olympic debut.", "The domestic Squash circuit is seeing growing participation and sponsorship."],
+      "trajectory": { "years": [2022,2023,2024,2025], "medalCounts": [1,1,2,2] },
+      "newsArticles": [
+        { "headline": "US squash players climbing world rankings for LA28 debut", "recencyWeight": 1.0 },
+        { "headline": "Olympic announcement fuels squash participation in the US", "recencyWeight": 0.88 },
+        { "headline": "Professional Squash Association eyes US expansion around LA28", "recencyWeight": 0.8 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 28, "qualificationSlotsEarned": 4, "youthProgramExpansion": true, "isNewOlympicSport": true },
+      "sourceNotes": ["Public PSA and World Squash coverage"]
+    },
+    {
+      "id": "wheelchair",
+      "sport": "Wheelchair Basketball",
+      "category": "Paralympic",
+      "la28Status": "Featured LA28 Paralympic sport",
+      "worldChampionshipCount": 8,
+      "recentHeadlineCount": 3,
+      "growthSignalCount": 4,
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Consistent top-2 world ranking", "First-ever home LA Para Games", "Team-sport narrative appeal"],
+      "recentNewsSummaries": ["USA Wheelchair Basketball has consistently finished top-2 at major international competitions.", "First-ever LA Paralympic Games represents a historic home-games opportunity."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [7,8,7,8,9,9] },
+      "newsArticles": [
+        { "headline": "Team USA wheelchair basketball targets LA28 gold", "recencyWeight": 1.0 },
+        { "headline": "Viewership growing on major streaming platforms", "recencyWeight": 0.9 },
+        { "headline": "Roster depth appears strong heading into qualifying cycle", "recencyWeight": 0.82 }
+      ],
+      "pipeline": { "juniorAthletesApprox": 38, "qualificationSlotsEarned": 8, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public IWBF and Team USA Paralympic coverage"]
     },
     {
       "id": "para-swimming",
@@ -95,43 +347,19 @@
       "category": "Paralympic",
       "la28Status": "Featured LA28 Paralympic sport",
       "worldChampionshipCount": 10,
-      "recentHeadlineCount": 4,
+      "recentHeadlineCount": 3,
       "growthSignalCount": 4,
-      "momentumSignals": [
-        "Strong medal-event visibility",
-        "Reliable Team USA depth",
-        "Expanding fan storytelling potential"
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Strong medal-event visibility", "Reliable Team USA depth", "LA28 home Games tailwind"],
+      "recentNewsSummaries": ["Para swimming remains one of the most visible Paralympic sports internationally.", "A steady stream of athlete development stories keeps fan interest growing."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [11,12,11,13,14,15] },
+      "newsArticles": [
+        { "headline": "Team USA para swimmers dominate world championship podiums", "recencyWeight": 1.0 },
+        { "headline": "Growing coverage of para swimming on major sports networks", "recencyWeight": 0.9 },
+        { "headline": "New para swimmer classification reforms benefit US program", "recencyWeight": 0.82 }
       ],
-      "recentNewsSummaries": [
-        "Para swimming remains one of the most visible Paralympic sports in international reporting and recap coverage.",
-        "A steady stream of athlete development stories may keep fan interest growing ahead of LA28."
-      ],
-      "sourceNotes": [
-        "Public Team USA Paralympic and international para swimming coverage",
-        "Curated MVP dataset for hackathon demo"
-      ]
-    },
-    {
-      "id": "wheelchair-basketball",
-      "sport": "Wheelchair Basketball",
-      "category": "Paralympic",
-      "la28Status": "Featured LA28 Paralympic sport",
-      "worldChampionshipCount": 8,
-      "recentHeadlineCount": 4,
-      "growthSignalCount": 5,
-      "momentumSignals": [
-        "Strong team-sport drama",
-        "Accessible game flow for new fans",
-        "Growing recognition in multi-sport coverage"
-      ],
-      "recentNewsSummaries": [
-        "Wheelchair basketball continues to benefit from the familiarity of a widely understood team-sport format.",
-        "Competitive parity and strong visual pacing could help more casual fans stay engaged before LA28."
-      ],
-      "sourceNotes": [
-        "Public Team USA Paralympic and international wheelchair basketball coverage",
-        "Curated MVP dataset for hackathon demo"
-      ]
+      "pipeline": { "juniorAthletesApprox": 48, "qualificationSlotsEarned": 16, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public World Para Swimming and Team USA coverage"]
     },
     {
       "id": "para-athletics",
@@ -141,41 +369,37 @@
       "worldChampionshipCount": 12,
       "recentHeadlineCount": 3,
       "growthSignalCount": 4,
-      "momentumSignals": [
-        "Wide event diversity",
-        "Large storytelling surface across classifications",
-        "Strong international relevance"
+      "isNewOlympicSport": false,
+      "momentumSignals": ["Wide event diversity", "Large storytelling surface", "Strong international relevance"],
+      "recentNewsSummaries": ["Para athletics remains central to major Paralympic competition coverage.", "Multiple event formats and athlete pathways keep momentum broad."],
+      "trajectory": { "years": [2019,2021,2022,2023,2024,2025], "medalCounts": [14,15,14,16,17,18] },
+      "newsArticles": [
+        { "headline": "Team USA para athletes set multiple world records in 2025", "recencyWeight": 1.0 },
+        { "headline": "Para athletics draw record broadcast audience at world championships", "recencyWeight": 0.9 },
+        { "headline": "Classification changes open new medal opportunities for US program", "recencyWeight": 0.82 }
       ],
-      "recentNewsSummaries": [
-        "Para athletics remains central to major Paralympic competition coverage because of its breadth and visibility.",
-        "Multiple event formats and athlete pathways could keep momentum broad rather than concentrated in one storyline."
-      ],
-      "sourceNotes": [
-        "Public Team USA Paralympic and world para athletics coverage",
-        "Curated MVP dataset for hackathon demo"
-      ]
+      "pipeline": { "juniorAthletesApprox": 60, "qualificationSlotsEarned": 20, "youthProgramExpansion": true, "isNewOlympicSport": false },
+      "sourceNotes": ["Public World Para Athletics and Team USA coverage"]
     },
     {
-      "id": "sitting-volleyball",
-      "sport": "Sitting Volleyball",
-      "category": "Paralympic",
-      "la28Status": "Featured LA28 Paralympic sport",
-      "worldChampionshipCount": 7,
+      "id": "cricket",
+      "sport": "Cricket",
+      "category": "Olympic",
+      "la28Status": "Olympic debut at LA28",
+      "worldChampionshipCount": 2,
       "recentHeadlineCount": 3,
-      "growthSignalCount": 4,
-      "momentumSignals": [
-        "Strong team identity",
-        "Clear match drama for spectators",
-        "Steady fan engagement upside"
+      "growthSignalCount": 3,
+      "isNewOlympicSport": true,
+      "momentumSignals": ["Rapidly growing diaspora base", "T20 Olympic debut", "Recent competitive improvement"],
+      "recentNewsSummaries": ["USA Cricket has seen rapid membership growth from diaspora communities.", "Recent competitive results suggest the team may be more competitive than projected."],
+      "trajectory": { "years": [2021,2022,2023,2024,2025], "medalCounts": [1,1,1,2,2] },
+      "newsArticles": [
+        { "headline": "USA Cricket membership doubles after Olympic spot confirmed", "recencyWeight": 1.0 },
+        { "headline": "USA surprises in ICC events with improved T20 performances", "recencyWeight": 0.88 },
+        { "headline": "Diaspora communities fuel cricket infrastructure investments", "recencyWeight": 0.78 }
       ],
-      "recentNewsSummaries": [
-        "Sitting volleyball continues to earn attention through its pace, teamwork, and repeat fan familiarity.",
-        "Team-based rivalries and recognizable match momentum may help the sport stay visible on the road to LA28."
-      ],
-      "sourceNotes": [
-        "Public Team USA Paralympic and international sitting volleyball coverage",
-        "Curated MVP dataset for hackathon demo"
-      ]
+      "pipeline": { "juniorAthletesApprox": 30, "qualificationSlotsEarned": 4, "youthProgramExpansion": true, "isNewOlympicSport": true },
+      "sourceNotes": ["Public ICC and USA Cricket coverage"]
     }
   ]
 }

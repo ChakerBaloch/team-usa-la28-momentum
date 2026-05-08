@@ -54,9 +54,40 @@ function parseAnalysisResponse(rawText) {
   return parsed;
 }
 
+// ── Shared multi-agent helper ─────────────────────────────────────────────────
+
+/**
+ * Generic Gemini call used by all specialist agents.
+ * @param {string} agentId - for logging
+ * @param {string} promptText - the full agent prompt
+ * @param {object} jsonSchema - JSON schema for structured output
+ * @param {object} [opts] - optional overrides: { temperature, systemInstruction, model }
+ */
+export async function callAgent(agentId, promptText, jsonSchema, opts = {}) {
+  const client = getClient();
+  const model = opts.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash-preview-04-17';
+
+  const response = await client.models.generateContent({
+    model,
+    contents: promptText,
+    config: {
+      systemInstruction: opts.systemInstruction || SYSTEM_INSTRUCTION,
+      responseMimeType: 'application/json',
+      responseJsonSchema: jsonSchema,
+      temperature: opts.temperature ?? 0.5,
+    },
+  });
+
+  const rawText = response.text;
+  const normalizedText = rawText.trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+  return JSON.parse(normalizedText);
+}
+
+// ── Legacy single-sport analysis (used by POST /api/analyze) ──────────────────
+
 export async function generateMomentumAnalysis({ sport, datasetLabel }) {
   const client = getClient();
-  const model = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
+  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash-preview-04-17';
 
   const prompt = `
 Dataset label: ${datasetLabel}

@@ -1,5 +1,29 @@
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
 
+function extractErrorMessage(errorPayload) {
+  if (!errorPayload) {
+    return 'Request failed.';
+  }
+
+  if (typeof errorPayload === 'string') {
+    return errorPayload;
+  }
+
+  if (typeof errorPayload.error === 'string') {
+    return errorPayload.error;
+  }
+
+  if (typeof errorPayload.error?.message === 'string') {
+    return errorPayload.error.message;
+  }
+
+  if (typeof errorPayload.message === 'string') {
+    return errorPayload.message;
+  }
+
+  return 'Request failed.';
+}
+
 async function requestJson(path, options = {}) {
   const headers = { ...(options.headers || {}) };
 
@@ -14,7 +38,7 @@ async function requestJson(path, options = {}) {
 
   if (!response.ok) {
     const errorPayload = await response.json().catch(() => ({}));
-    throw new Error(errorPayload.error || 'Request failed.');
+    throw new Error(extractErrorMessage(errorPayload));
   }
 
   return response.json();
@@ -29,4 +53,8 @@ export function analyzeSport(sportId) {
     method: 'POST',
     body: JSON.stringify({ sportId }),
   });
+}
+
+export function analyzeAll() {
+  return requestJson('/analyze-all', { method: 'POST' });
 }

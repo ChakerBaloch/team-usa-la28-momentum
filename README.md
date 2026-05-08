@@ -1,150 +1,109 @@
 # Team USA LA28 Momentum Tracker
 
-Team USA LA28 Momentum Tracker is a hackathon MVP for the Team USA x Google Cloud Hackathon, built for Challenge 3: "The Road to LA28 Games Bracket." It gives fans a clean, interactive way to compare Olympic and Paralympic sports using curated public-data-inspired momentum signals, then uses Gemini to turn those signals into fan-friendly analysis.
+Team USA LA28 Momentum Tracker is a fan-facing hackathon app for the Team USA x Google Cloud Hackathon, built for Challenge 3: “The Road to LA28 Games Bracket.” The current build has moved beyond the original single-sport MVP into a synthesis-driven momentum board that ranks Team USA sports, runs a multi-agent Gemini analysis pipeline, and presents the results in a more editorial, analyst-style interface.
 
-The app is intentionally simple: a React frontend shows a ranked leaderboard, a bracket-style top four comparison, and a detail panel. An Express backend loads a local JSON dataset, calculates deterministic momentum scores, and calls Gemini for structured narrative analysis.
+The app is intentionally still a hackathon build. It runs as a single Cloud Run service, uses Gemini for structured reasoning and narrative generation, and keeps a curated local JSON dataset as the source of truth. Firestore is intentionally deferred for now.
 
-## What This MVP Does
+## Current Product State
 
-- Ranks 8 sports with equal treatment across Olympic and Paralympic categories.
-- Calculates a deterministic momentum score using a transparent backend formula.
-- Shows a "Momentum Bracket" for the current top 4 sports.
-- Calls Gemini to generate a momentum summary, fan reasons to watch, LA28 outlook, score explanation, parity note, and caution statement.
-- Uses cautious language and avoids guaranteeing future outcomes.
-- Supports local development and a single-service deployment path to Google Cloud Run.
+The codebase currently includes:
 
-## Feature Snapshot
+- A redesigned React + Vite frontend with a hero, agent-status strip, tiered momentum board, and right-side detail panel
+- A Node.js + Express backend that serves both API routes and the production React build
+- Deterministic momentum scoring in `server/utils/score.js`
+- A legacy single-sport Gemini route at `POST /api/analyze`
+- A new multi-agent full-board route at `POST /api/analyze-all`
+- Friendly UI error handling for quota, billing, API enablement, and network failures
+- Google Cloud Run deployment support
+- A GitHub Actions CI/CD workflow scaffold for validation and deploys
 
-- Responsive hero section and polished dashboard layout
-- Leaderboard cards with rank, category, score, and signal summary
-- Bracket-style comparison for top momentum sports
-- Detail panel with loading and error states
-- `GET /api/sports` for scored dataset access
-- `POST /api/analyze` for Gemini-powered structured analysis
-- Optional production serving of the built React app from Express
+Intentionally deferred:
 
-## Tech Stack
+- Firestore persistence or caching
+- Live ingestion pipelines or scheduled refresh jobs
+- SSE or streaming agent updates
+- Authentication, accounts, or admin tooling
 
-### Frontend
+## Frontend Experience
 
-- React
-- Vite
-- Plain CSS
+The current UI no longer behaves like the original leaderboard-plus-detail MVP. It now acts more like an AI analyst board:
 
-### Backend
+- The board auto-runs full momentum analysis after the sports dataset loads
+- Sports are grouped into `High momentum`, `Rising`, and `Building` tiers
+- A compact agent strip shows the multi-agent system progressing through the run
+- The detail panel highlights the selected sport’s composite score, confidence interval, agent signals, contradiction status, narrative, and parity note
+- User-facing failures are shown as friendly toast messages instead of raw backend errors
+- Clicking a different sport clears the current toast so the interface recovers cleanly
 
-- Node.js
-- Express
-- CORS
-- Gemini API via `@google/genai`
+## Agent Orchestration
 
-### Deployment
+The backend now includes a multi-agent orchestration flow behind `POST /api/analyze-all`.
 
-- Google Cloud Run
-- Docker multi-stage build
-
-## How Gemini Is Used
-
-Gemini is used only on the backend. When a fan selects a sport:
-
-1. The server loads the matching sport from the curated JSON dataset.
-2. The server calculates the sport's raw and normalized momentum scores.
-3. The server sends only the provided sport data and score breakdown to Gemini.
-4. Gemini returns structured JSON with:
-   - `momentumSummary`
-   - `whyFansShouldWatch`
-   - `la28Outlook`
-   - `scoreExplanation`
-   - `parityNote`
-   - `caution`
-
-The prompt explicitly tells Gemini to:
-
-- Analyze only the provided dataset
-- Avoid inventing athletes, medals, or exact results
-- Use conditional language
-- Treat Olympic and Paralympic sports with equal analytical depth
-
-## How Google Cloud Is Used
-
-This MVP is designed to deploy as a single containerized web service on Google Cloud Run:
-
-- Cloud Run hosts the Express server
-- The server can also serve the built React frontend from `client/dist`
-- `GEMINI_API_KEY` is supplied as a Cloud Run environment variable or secret
-- Cloud Run injects the runtime `PORT`, which the server already respects
-
-## Project Structure
-
-```text
-team-usa-la28-momentum/
-  client/
-    package.json
-    index.html
-    vite.config.js
-    src/
-      main.jsx
-      App.jsx
-      api.js
-      styles.css
-      components/
-        Hero.jsx
-        Leaderboard.jsx
-        Bracket.jsx
-        SportDetail.jsx
-  server/
-    package.json
-    index.js
-    .env.example
-    data/
-      sportsMomentum.json
-    utils/
-      score.js
-      gemini.js
-  Dockerfile
-  README.md
-  LICENSE
-  .gitignore
-  .dockerignore
+```mermaid
+flowchart LR
+  UI[React UI] -->|POST /api/analyze-all| API[Express API]
+  API --> ORCH[Orchestrator]
+  ORCH --> MT[Medal Trajectory Agent]
+  ORCH --> NS[News Sentiment Agent]
+  ORCH --> PG[Pipeline Growth Agent]
+  ORCH --> PP[Paralympic Parity Agent]
+  MT --> CD[Contradiction Detector]
+  NS --> CD
+  PG --> CD
+  PP --> CD
+  CD --> SJ[Synthesis Judge]
+  SJ --> NA[Narrative Agent]
+  NA --> RESP[Ranked Response]
+  RESP --> UI
 ```
 
-## Build Process Documentation
+### Agent Responsibilities
 
-This section documents the full MVP build process so you can explain the work clearly during judging or handoff.
+- `orchestrator.js`: prepares the full analysis pass
+- `medalTrajectory.js`: evaluates performance continuity and momentum trend framing
+- `newsSentiment.js`: measures public visibility and headline energy from the curated dataset
+- `pipelineGrowth.js`: evaluates developmental depth and future-facing pipeline strength
+- `paralympicParity.js`: adds parity-aware reasoning so Paralympic sports are handled with equal seriousness
+- `contradictionDetector.js`: flags disagreements between specialist signals
+- `synthesisJudge.js`: merges agent outputs into ranked scores and confidence intervals
+- `narrative.js`: turns ranked synthesis into fan-friendly sport narratives and momentum tier language
 
-### 1. Scope the MVP Around One Clear Fan Experience
+### Runtime Flow
 
-The product goal was narrowed to one simple story: show which Team USA Olympic and Paralympic sports appear to have stronger public momentum heading into LA28, then let Gemini explain why fans may want to watch them.
+The orchestration path is currently:
 
-That meant avoiding anything that would slow the build down without helping the demo:
+1. Run the orchestrator
+2. Run four specialist agents in parallel
+3. Run contradiction detection on the specialist outputs
+4. Run the synthesis judge on the merged signals
+5. Run the narrative generator on the ranked synthesis
+6. Return ranked output, raw agent output, and timing metadata to the UI
 
-- No authentication
-- No database
-- No scraping pipeline
-- No real tournament engine
-- No prediction claims presented as certainty
+The `POST /api/analyze-all` response includes:
 
-### 2. Create a Transparent, Curated Demo Dataset
+- `ranked`
+- `agentOutputs`
+- `executionMeta.timingsMs`
 
-The app uses a local file at `server/data/sportsMomentum.json` with 8 sports total:
+## Data Model and Scoring
 
-- 4 Olympic sports
-- 4 Paralympic sports
+The app still uses a local curated dataset at `server/data/sportsMomentum.json`. The dataset label remains:
 
-The dataset is labeled as a curated public-data-inspired demo dataset. It includes momentum-style indicators such as:
+`curated public-data-inspired demo dataset`
 
-- `worldChampionshipCount`
-- `recentHeadlineCount`
-- `growthSignalCount`
-- short momentum signals
-- recent news summaries
-- source notes
+The dataset is now richer than the original seed set:
 
-This keeps the MVP easy to explain and deterministic while still feeling grounded in real fan-facing storytelling.
+- 20 sports total
+- 17 Olympic sports
+- 3 Paralympic sports
+- Expanded coverage such as flag football, lacrosse, squash, and cricket
+- Richer fields such as news article summaries, trajectory hints, pipeline context, and “new sport” indicators
 
-### 3. Add Deterministic Scoring in the Backend
+One important truth to keep visible: the prompt design aims for equal Olympic and Paralympic respect, but the current demo dataset is not yet fully category-balanced.
 
-Momentum is calculated in `server/utils/score.js` using the required formula:
+### Deterministic Momentum Score
+
+The deterministic backend formula remains:
 
 ```text
 momentumScore =
@@ -159,133 +118,23 @@ Where:
 - `parityBonus = 10` for Paralympic sports
 - `parityBonus = 5` for Olympic sports
 
-The raw scores are then normalized to a `0-100` range across the 8-sport dataset. That gives the UI a clean, consistent score display while keeping the raw formula transparent.
+Scores are normalized to a `0–100` range before being returned to the client.
 
-### 4. Build the Express API Layer
+## API Surface
 
-Two main API routes power the app:
+### `GET /api/health`
 
-- `GET /api/sports`
-  Returns all sports with calculated scores and ranking.
-- `POST /api/analyze`
-  Accepts `{ "sportId": "swimming" }`, calculates the score, and sends the selected record to Gemini for structured analysis.
-
-The backend also:
-
-- loads `GEMINI_API_KEY` from environment variables
-- uses `process.env.PORT` for Cloud Run compatibility
-- enables CORS for configured frontend origins
-- serves the production React build when present
-
-### 5. Use Gemini for Structured Fan-Friendly Analysis
-
-The Gemini helper in `server/utils/gemini.js` uses a structured JSON schema so the frontend receives predictable fields for display.
-
-This was chosen to keep the demo reliable:
-
-- no parsing of loose prose blobs
-- no markdown cleanup in the UI
-- easy loading and error handling
-- simple judge-friendly explanation of the AI workflow
-
-### 6. Build a Focused React Frontend
-
-The frontend centers on four pieces:
-
-1. Hero section
-2. Momentum leaderboard
-3. Bracket-style top four comparison
-4. Detail panel with Gemini analysis
-
-The UI is intentionally polished but lightweight, using plain CSS and responsive cards rather than a component framework.
-
-### 7. Prepare a Simple Cloud Run Deployment Path
-
-The included `Dockerfile` builds the React client, installs server dependencies, and runs the Express app as a single Cloud Run service. That makes the deployment story much easier for a hackathon:
-
-- one service
-- one URL
-- one environment variable for Gemini
-
-### 8. Verify Locally
-
-The final verification path is:
-
-1. Run the Express API locally on port `8080`
-2. Run the Vite frontend locally on port `5173`
-3. Use the UI to fetch the sports list and request Gemini analysis for a selected sport
-4. Run a production client build to confirm the app is ready for container deployment
-
-## Local Development Setup
-
-### Prerequisites
-
-- Node.js 20 or later
-- A Gemini API key
-
-### Backend Setup
-
-```bash
-cd server
-npm install
-cp .env.example .env
-```
-
-Edit `server/.env`:
-
-```env
-GEMINI_API_KEY=your_key_here
-PORT=8080
-FRONTEND_ORIGIN=http://localhost:5173
-GEMINI_MODEL=gemini-3-flash-preview
-```
-
-`FRONTEND_ORIGIN` is optional when the frontend and backend are deployed together on Cloud Run. Keep it for local split-origin development or if the frontend is hosted separately.
-
-Start the backend:
-
-```bash
-npm run dev
-```
-
-### Frontend Setup
-
-Open a second terminal:
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-The Vite dev server runs on `http://localhost:5173` and proxies `/api` requests to `http://localhost:8080`.
-
-## API Reference
+Returns a simple health response.
 
 ### `GET /api/sports`
 
-Returns the curated dataset plus calculated scores and rank.
-
-Example response shape:
-
-```json
-{
-  "datasetLabel": "curated public-data-inspired demo dataset",
-  "sports": [
-    {
-      "id": "swimming",
-      "sport": "Swimming",
-      "category": "Olympic",
-      "momentumScore": 84,
-      "rank": 4
-    }
-  ]
-}
-```
+Returns the curated dataset with calculated scores and rank metadata.
 
 ### `POST /api/analyze`
 
-Request:
+Legacy single-sport Gemini analysis route kept for backward compatibility.
+
+Request body:
 
 ```json
 {
@@ -293,90 +142,194 @@ Request:
 }
 ```
 
-Response shape:
+Returns:
 
-```json
-{
-  "sportId": "swimming",
-  "momentumScore": 84,
-  "analysis": {
-    "momentumSummary": "...",
-    "whyFansShouldWatch": "...",
-    "la28Outlook": "...",
-    "scoreExplanation": "...",
-    "parityNote": "...",
-    "caution": "..."
-  }
-}
-```
+- `sportId`
+- `momentumScore`
+- `analysis`
 
-## Deploying to Google Cloud Run
+### `POST /api/analyze-all`
 
-### 1. Authenticate and Select a Project
+Runs the full multi-agent pipeline and returns:
+
+- synthesized ranked output
+- contradiction summaries
+- parity output
+- generated narratives
+- execution timing metadata
+
+## How Gemini Is Used
+
+Gemini is used only on the backend. The frontend never calls Gemini directly.
+
+Current implementation details:
+
+- `server/utils/gemini.js` exposes a reusable `callAgent()` helper for specialist agents
+- The single-sport route still uses strict structured JSON output
+- The model is configured through `GEMINI_MODEL`
+- The current deploy target is set up for `gemini-3-flash-preview`
+
+The prompt behavior is intentionally constrained:
+
+- analyze only the provided dataset
+- do not invent athletes, medals, article titles, or exact results
+- use cautious, conditional language
+- do not guarantee future outcomes
+- give Olympic and Paralympic sports equal analytical depth and respect
+
+## Google Cloud Architecture
+
+This project is designed to be simple to demo and simple to deploy:
+
+- Cloud Run hosts the Node.js service
+- Express serves both the API and the production React build
+- `PORT` is taken from Cloud Run at runtime
+- `GEMINI_API_KEY` is provided through environment variables
+- `GEMINI_MODEL` can be overridden per environment
+
+This keeps the deployment model lean:
+
+- one container
+- one public URL
+- no external database dependency
+- no separate frontend hosting requirement
+
+## CI/CD
+
+The repo includes a GitHub Actions workflow at `.github/workflows/cloud-run-cicd.yml`.
+
+Current intent:
+
+- On pull requests to `main`, install dependencies and validate the app
+- On pushes to `main`, deploy to Cloud Run
+- Authenticate to Google Cloud through Workload Identity Federation
+
+Repository configuration required:
+
+- GitHub Secret: `GEMINI_API_KEY`
+- GitHub Variable: `GCP_WIF_PROVIDER`
+- GitHub Variable: `GCP_SERVICE_ACCOUNT`
+
+Current caveat:
+
+- The workflow scaffold exists, but the validation step still reflects the original `8`-sport assumption. Since the dataset is now `20` sports, that check should be updated before treating CI as authoritative.
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 20+
+- A Gemini API key
+
+### Backend
 
 ```bash
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
+cd server
+npm install
+cp .env.example .env
 ```
 
-### 2. Enable Required Services
+Recommended `server/.env`:
 
 ```bash
-gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-3-flash-preview
+PORT=8080
+FRONTEND_ORIGIN=http://localhost:5173
 ```
 
-### 3. Deploy From the Project Root
+Start the API:
 
-From `team-usa-la28-momentum/`:
+```bash
+npm run dev
+```
+
+### Frontend
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+By default:
+
+- frontend runs at `http://localhost:5173`
+- backend runs at `http://localhost:8080`
+
+### Production Build
+
+```bash
+cd client
+npm run build
+```
+
+Once `client/dist` exists, the Express server can serve the built frontend directly.
+
+## Deploying to Cloud Run
+
+From the project root:
 
 ```bash
 gcloud run deploy team-usa-la28-momentum \
   --source . \
   --region us-central1 \
   --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+  --set-env-vars GEMINI_API_KEY=YOUR_GEMINI_API_KEY,GEMINI_MODEL=gemini-3-flash-preview
 ```
 
-If you prefer using Secret Manager, replace the plain env var with a secret-backed configuration.
+The service already respects `process.env.PORT`, so it is Cloud Run compatible without extra runtime changes.
 
-### 4. Optional CORS Configuration
+## Project Structure
 
-If you later split the frontend and backend into separate services, add the deployed frontend origin:
-
-```bash
-gcloud run services update team-usa-la28-momentum \
-  --region us-central1 \
-  --update-env-vars FRONTEND_ORIGIN=https://your-frontend-domain
+```text
+team-usa-la28-momentum/
+  .github/
+    workflows/
+      cloud-run-cicd.yml
+  client/
+    src/
+      App.jsx
+      api.js
+      main.jsx
+      styles.css
+    index.html
+    package.json
+    vite.config.js
+  server/
+    data/
+      sportsMomentum.json
+    utils/
+      agents/
+        orchestrator.js
+        medalTrajectory.js
+        newsSentiment.js
+        pipelineGrowth.js
+        paralympicParity.js
+        contradictionDetector.js
+        synthesisJudge.js
+        narrative.js
+      gemini.js
+      score.js
+    .env.example
+    index.js
+    package.json
+  Dockerfile
+  LICENSE
+  README.md
+  .dockerignore
+  .gitignore
 ```
 
-### 5. Test the Deployed Service
+## Known Gaps and Deferred Work
 
-- Open the Cloud Run service URL
-- Confirm the leaderboard loads
-- Click a sport and verify Gemini analysis appears
-
-## Judging Notes
-
-This MVP is easy to demo live:
-
-1. Show the ranked sports list.
-2. Explain that the score is deterministic and transparent.
-3. Click into a sport to show Gemini turning structured signals into fan-friendly analysis.
-4. Point out the parity bonus and equal treatment of Olympic and Paralympic sports.
-5. Reinforce that the language is cautious and does not guarantee future performance.
-
-## Verification Notes
-
-The MVP was checked with:
-
-- dependency installation in both `client/` and `server/`
-- a successful Vite production build
-- a live smoke test confirming:
-  - `GET /api/health` returns `200`
-  - `GET /api/sports` returns 8 scored sports
-  - `GET /` serves the built React app through Express
-  - `POST /api/analyze` correctly reports a missing `GEMINI_API_KEY` until a real key is supplied
+- Firestore is explicitly skipped for now
+- The local JSON file is still the only source of truth
+- No scheduled ingestion or background refresh jobs exist yet
+- No SSE or streaming response path is implemented for live agent updates
+- The current dataset is broader, but still not fully parity-balanced across Olympic and Paralympic entries
+- CI validation needs a small refresh to match the expanded dataset
 
 ## Data Disclaimer
 
-This project uses a curated public-data-inspired demo dataset for hackathon purposes. Gemini explains patterns from the provided dataset and does not guarantee future results, athlete outcomes, or Team USA performance at LA28.
+This app uses a curated public-data-inspired demo dataset. Gemini explains patterns from the provided data and does not guarantee future results, medal outcomes, or LA28 performance. The app is intended to help fans follow momentum signals, not to present deterministic predictions.

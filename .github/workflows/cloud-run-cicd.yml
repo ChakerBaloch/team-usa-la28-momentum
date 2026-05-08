@@ -1,0 +1,100 @@
+name: Cloud Run CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Install client dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Build client
+        working-directory: client
+        run: npm run build
+
+      - name: Validate dataset and server scoring
+        run: |
+          node --input-type=module -e "
+          import { readFile } from 'node:fs/promises';
+          import { enrichSportsWithScores } from './server/utils/score.js';
+
+          const rawDataset = await readFile('./server/data/sportsMomentum.json', 'utf8');
+          const parsedDataset = JSON.parse(rawDataset);
+          const scoredSports = enrichSportsWithScores(parsedDataset.sports);
+
+          if (scoredSports.length !== 8) {
+            throw new Error('Expected exactly 8 sports in the dataset.');
+          }
+
+          if (typeof scoredSports[0]?.momentumScore !== 'number') {
+            throw new Error('Momentum score calculation did not return a number.');
+          }
+
+          console.log('Validated dataset and scoring successfully.');
+          "
+
+  deploy:
+    name: Deploy to Cloud Run
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: cloud-run-production
+      cancel-in-progress: true
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: team-usa-la28-momentum-tracker
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - id: deploy
+        name: Deploy service
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          project_id: team-usa-la28-momentum-tracker
+          service: team-usa-la28-momentum
+          region: us-central1
+          source: .
+          env_vars: |-
+            GEMINI_MODEL=gemini-3-flash-preview
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+
+      - name: Print service URL
+        run: echo "Service URL: ${{ steps.deploy.outputs.url }}"
