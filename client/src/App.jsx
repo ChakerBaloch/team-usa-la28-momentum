@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { analyzeAll, fetchSports } from './api';
+import { analyzeAll, fetchSports, loadMomentumData } from './api';
 import './styles.css';
+import usFlag from './us-flag.svg';
 
 const AGENTS = [
-  { id: 'medal_trajectory', label: 'Medal trajectory' },
-  { id: 'news_sentiment', label: 'News sentiment' },
-  { id: 'pipeline_growth', label: 'Pipeline growth' },
-  { id: 'paralympic_parity', label: 'Para parity' },
-  { id: 'synthesis_judge', label: 'Synthesis judge' },
+  { id: 'medal_trajectory', label: 'Medal trend' },
+  { id: 'news_sentiment', label: 'Press coverage' },
+  { id: 'pipeline_growth', label: 'Athlete development' },
+  { id: 'paralympic_parity', label: 'Paralympic' },
+  { id: 'synthesis_judge', label: 'Overall ranking' },
 ];
 
 const SCORE_COLOR = {
@@ -32,7 +33,7 @@ function AgentStrip({ agentState }) {
                 ? 'Ranking…'
                 : 'Running…'
               : state === 'error'
-                ? 'Retry soon'
+                ? 'Paused — retrying'
                 : 'Waiting';
 
         return (
@@ -70,7 +71,7 @@ function ErrorToast({ message, visible }) {
 
   return (
     <div className={`error-toast${visible ? ' error-toast-visible' : ''}`} role="status" aria-live="polite">
-      <div className="error-toast-label">AI update</div>
+      <div className="error-toast-label">Analysis update</div>
       <div className="error-toast-body">{message}</div>
     </div>
   );
@@ -98,7 +99,7 @@ function SportRow({ sportData, rankedData, isActive, onSelect }) {
       <div className="sr-body">
         <div className="sr-name">
           {name}
-          {category === 'Paralympic' ? <span className="badge badge-para">Para</span> : null}
+          {category === 'Paralympic' ? <span className="badge badge-para">Paralympic</span> : null}
           {isNew ? <span className="badge badge-new">New</span> : null}
         </div>
         <div className="sr-sub">{summary}</div>
@@ -155,7 +156,7 @@ function DetailPanel({ detail }) {
         <div className="panel-score" style={{ color }}>
           {detail.composite_score}
         </div>
-        <div className="panel-ci">± {detail.confidence_interval} confidence interval</div>
+        <div className="panel-ci">± {detail.confidence_interval} pt margin</div>
       </div>
 
       <div className="signals">
@@ -174,15 +175,34 @@ function DetailPanel({ detail }) {
       </div>
 
       {detail.contradiction ? (
-        <div className="conflict-flag">⚠ Contradiction detected — {detail.contradiction}</div>
+        <div className="conflict-flag">⚠ The data is mixed — {detail.contradiction}</div>
       ) : (
-        <div className="no-conflict">✓ All agents aligned — no signal conflicts detected</div>
+        <div className="no-conflict">✓ Ranking factors agree</div>
       )}
 
-      <div className="narrative">{detail.narrative}</div>
+      {detail.headline ? (
+        <div className="vibe-container">
+          <h2 className="vibe-headline">{detail.headline}</h2>
+          <div className="vibe-why-watch">
+            <span className="vibe-label">Why Watch</span>
+            <p>{detail.why_watch}</p>
+          </div>
+          <p className="vibe-story">{detail.momentum_story}</p>
+          <div className="vibe-fan-signal">
+            <span className="vibe-fan-icon">🔥</span>
+            {detail.fan_signal}
+          </div>
+          <div className="vibe-prediction">
+            <span className="vibe-label">LA28 Outlook</span>
+            <p>{detail.la28_prediction}</p>
+          </div>
+        </div>
+      ) : (
+        <div className="narrative">{detail.narrative}</div>
+      )}
 
       <div className="para-block">
-        <div className="para-label">Paralympic parity</div>
+        <div className="para-label">Paralympic coverage</div>
         {detail.paraNote.grade === 'N/A' ? (
           <span className="para-note para-note-muted">{detail.paraNote.note}</span>
         ) : (
@@ -196,6 +216,26 @@ function DetailPanel({ detail }) {
       <GCloudBadge />
     </div>
   );
+}
+
+// Maps any old/server label to the approved copy
+const SIGNAL_LABEL_MAP = {
+  'Medal trajectory': 'Medal trend',
+  'Medal Trajectory': 'Medal trend',
+  'News sentiment': 'Press coverage',
+  'News Sentiment': 'Press coverage',
+  'Pipeline growth': 'Athlete development',
+  'Pipeline Growth': 'Athlete development',
+  'Para parity': 'Paralympic',
+  'Para Parity': 'Paralympic',
+  'Paralympic parity': 'Paralympic',
+  'Paralympic Parity': 'Paralympic',
+  'Synthesis judge': 'Overall ranking',
+  'Synthesis Judge': 'Overall ranking',
+};
+
+function normalizeSignalLabel(label) {
+  return SIGNAL_LABEL_MAP[label] || label;
 }
 
 function getTierFromScore(score) {
@@ -237,18 +277,18 @@ function buildFallbackDetail(sport) {
   const paraNote =
     sport.category === 'Paralympic'
       ? {
-          grade: 'A',
-          note: 'This Paralympic sport is included with full analytical weight in the demo and could help fans follow equal momentum signals.',
-        }
+        grade: 'A',
+        note: 'This Paralympic sport carries full analytical weight in the rankings.',
+      }
       : sport.isNewOlympicSport
         ? {
-            grade: 'N/A',
-            note: 'A parallel Paralympic comparison is not represented for this sport in the current demo dataset.',
-          }
+          grade: 'N/A',
+          note: 'No Paralympic counterpart exists for this sport in the current dataset.',
+        }
         : {
-            grade: 'B',
-            note: 'Parity context may become clearer once the multi-agent synthesis finishes comparing Olympic and Paralympic signals.',
-          };
+          grade: 'B',
+          note: 'Paralympic coverage will be clearer once the full analysis is complete.',
+        };
 
   return {
     sport: sport.sport,
@@ -257,17 +297,17 @@ function buildFallbackDetail(sport) {
     momentum_tier: tier,
     signals: [
       {
-        label: 'Medal trajectory',
+        label: 'Medal trend',
         value: clampScore(sport.worldChampionshipCount * 8),
         color: '#E8451A',
       },
       {
-        label: 'News sentiment',
+        label: 'Press coverage',
         value: clampScore(sport.recentHeadlineCount * 20),
         color: '#1A6FE8',
       },
       {
-        label: 'Pipeline growth',
+        label: 'Athlete development',
         value: clampScore(sport.growthSignalCount * 20),
         color: '#22c55e',
       },
@@ -285,11 +325,16 @@ function buildRankedDetail(rankedSport, sportData, contradiction) {
     confidence_interval: rankedSport.confidence_interval,
     momentum_tier: rankedSport.momentum_tier,
     signals: (rankedSport.signals || []).map((signal, index) => ({
-      label: signal.label,
+      label: normalizeSignalLabel(signal.label),
       value: signal.value,
       color: ['#E8451A', '#1A6FE8', '#22c55e'][index % 3],
     })),
     contradiction: contradiction || null,
+    headline: rankedSport.headline || null,
+    why_watch: rankedSport.why_watch || null,
+    momentum_story: rankedSport.momentum_story || null,
+    la28_prediction: rankedSport.la28_prediction || null,
+    fan_signal: rankedSport.fan_signal || null,
     narrative: rankedSport.narrative || buildFallbackDetail(sportData).narrative,
     paraNote: rankedSport.para_note || buildFallbackDetail(sportData).paraNote,
   };
@@ -305,7 +350,7 @@ function getFriendlyErrorMessage(error, context) {
     || rawMessage.includes('rate limit')
     || rawMessage.includes('429')
   ) {
-    return 'Momentum analysis is taking a short break because the AI usage limit was reached. You can still explore the board and try again soon.';
+    return 'Analysis is paused. We\'ll resume shortly, but you can keep exploring the current rankings.';
   }
 
   if (
@@ -315,11 +360,11 @@ function getFriendlyErrorMessage(error, context) {
     || rawMessage.includes('api is not available')
     || rawMessage.includes('api has not been used')
   ) {
-    return 'The AI analysis service is still waking up for this deployment. Please try again in a few minutes.';
+    return 'The analysis service is still starting up. Try again in a few minutes.';
   }
 
   if (rawMessage.includes('missing gemini_api_key')) {
-    return 'The AI analysis service is not configured for this deployment yet.';
+    return 'Analysis is not configured for this deployment yet.';
   }
 
   if (
@@ -328,13 +373,13 @@ function getFriendlyErrorMessage(error, context) {
     || rawMessage.includes('network request failed')
   ) {
     return context === 'sports'
-      ? 'We could not reach the momentum service right now. Please refresh and try again.'
-      : 'We could not reach the AI analysis service right now. Please try again in a moment.';
+      ? 'Can\'t reach the service right now. Please refresh and try again.'
+      : 'Can\'t reach the analysis service right now. Try again in a moment.';
   }
 
   return context === 'sports'
-    ? 'We could not load the momentum board right now. Please refresh and try again.'
-    : 'We could not refresh the AI momentum analysis right now. Please try again in a moment.';
+    ? 'Could not load the sport list right now. Please refresh and try again.'
+    : 'Could not refresh the rankings right now. Try again in a moment.';
 }
 
 export default function App() {
@@ -345,7 +390,8 @@ export default function App() {
   const [contradictionMap, setContradictionMap] = useState({});
   const [analysisError, setAnalysisError] = useState('');
   const [selectedId, setSelectedId] = useState('');
-  const [didKickoffAnalysis, setDidKickoffAnalysis] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [dataSource, setDataSource] = useState('loading'); // 'gcs' | 'fallback' | 'live' | 'loading'
   const [toast, setToast] = useState({ message: '', visible: false, key: 0 });
   const [agentState, setAgentState] = useState({
     medal_trajectory: 'idle',
@@ -411,32 +457,83 @@ export default function App() {
     loadSports();
   }, []);
 
-  useEffect(() => {
-    if (sportsLoading || !sports.length || didKickoffAnalysis) {
-      return;
-    }
+  async function runAnalysis() {
+    if (isAnalyzing) return;
+    setIsAnalyzing(true);
+    setAnalysisError('');
+    setAgentState({
+      medal_trajectory: 'live',
+      news_sentiment: 'live',
+      pipeline_growth: 'live',
+      paralympic_parity: 'live',
+      synthesis_judge: 'idle',
+    });
 
-    setDidKickoffAnalysis(true);
+    const synthTimer = setTimeout(() => {
+      setAgentState((current) => ({ ...current, synthesis_judge: 'live' }));
+    }, 1600);
 
-    async function runInitialAnalysis() {
-      setAnalysisError('');
+    try {
+      const result = await analyzeAll();
+      clearTimeout(synthTimer);
+
+      // RULE 3: Live results stay in React state only.
+      // They are never written to Cloud Storage, localStorage, or any persistence API.
+      // Refreshing the page will show the cron data, not this live run.
+      setRanked(result.ranked || []);
+      setDataSource('live');
       setAgentState({
-        medal_trajectory: 'live',
-        news_sentiment: 'live',
-        pipeline_growth: 'live',
-        paralympic_parity: 'live',
-        synthesis_judge: 'idle',
+        medal_trajectory: 'done',
+        news_sentiment: 'done',
+        pipeline_growth: 'done',
+        paralympic_parity: 'done',
+        synthesis_judge: 'done',
       });
 
-      const synthTimer = setTimeout(() => {
-        setAgentState((current) => ({ ...current, synthesis_judge: 'live' }));
-      }, 1600);
+      const nextContradictions = {};
+      for (const contradiction of result.agentOutputs?.contradictions?.contradictions || []) {
+        nextContradictions[contradiction.sport] = contradiction.description;
+      }
+      setContradictionMap(nextContradictions);
 
+      if (result.ranked?.length) {
+        const topSport = findSportMatch(result.ranked[0].sport, sports);
+        if (topSport) {
+          setSelectedId(topSport.id);
+        }
+      }
+    } catch (error) {
+      clearTimeout(synthTimer);
+      setAnalysisError(error.message || 'Unable to finish the multi-agent ranking.');
+      showFriendlyToast(getFriendlyErrorMessage(error, 'analysis'));
+      setAgentState({
+        medal_trajectory: 'error',
+        news_sentiment: 'error',
+        pipeline_growth: 'error',
+        paralympic_parity: 'error',
+        synthesis_judge: 'error',
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }
+
+  // RULE 1: Page load fetches from Cloud Storage — zero Gemini calls.
+  // Falls back to local sportsMomentum.json seed if GCS is empty.
+  useEffect(() => {
+    async function loadFromStorage() {
       try {
-        const result = await analyzeAll();
-        clearTimeout(synthTimer);
+        const data = await loadMomentumData();
+        setRanked(data.ranked || []);
 
-        setRanked(result.ranked || []);
+        const nextContradictions = {};
+        for (const c of data.agentOutputs?.contradictions?.contradictions || []) {
+          nextContradictions[c.sport] = c.description;
+        }
+        setContradictionMap(nextContradictions);
+        setDataSource('gcs');
+
+        // Set agents to done since we loaded cached data
         setAgentState({
           medal_trajectory: 'done',
           news_sentiment: 'done',
@@ -445,43 +542,29 @@ export default function App() {
           synthesis_judge: 'done',
         });
 
-        const nextContradictions = {};
-        for (const contradiction of result.agentOutputs?.contradictions?.contradictions || []) {
-          nextContradictions[contradiction.sport] = contradiction.description;
+        if (data.ranked?.length && sports.length) {
+          const topSport = findSportMatch(data.ranked[0].sport, sports);
+          if (topSport) setSelectedId(topSport.id);
         }
-        setContradictionMap(nextContradictions);
-
-        if (result.ranked?.length) {
-          const topSport = findSportMatch(result.ranked[0].sport, sports);
-          if (topSport) {
-            setSelectedId(topSport.id);
-          }
-        }
-      } catch (error) {
-        clearTimeout(synthTimer);
-        setAnalysisError(error.message || 'Unable to finish the multi-agent ranking.');
-        showFriendlyToast(getFriendlyErrorMessage(error, 'analysis'));
-        setAgentState({
-          medal_trajectory: 'error',
-          news_sentiment: 'error',
-          pipeline_growth: 'error',
-          paralympic_parity: 'error',
-          synthesis_judge: 'error',
-        });
+      } catch {
+        // GCS empty or unavailable — fall back to local sports data
+        setDataSource('fallback');
       }
     }
 
-    runInitialAnalysis();
-  }, [didKickoffAnalysis, sports, sportsLoading]);
+    if (!sportsLoading && sports.length) {
+      loadFromStorage();
+    }
+  }, [sportsLoading, sports]);
 
   const displaySports =
     ranked.length > 0
       ? ranked
-          .map((rankedSport) => {
-            const sport = findSportMatch(rankedSport.sport, sports);
-            return sport ? { sport, ranked: rankedSport } : null;
-          })
-          .filter(Boolean)
+        .map((rankedSport) => {
+          const sport = findSportMatch(rankedSport.sport, sports);
+          return sport ? { sport, ranked: rankedSport } : null;
+        })
+        .filter(Boolean)
       : sports.map((sport) => ({ sport, ranked: null }));
 
   const groupedSports = {
@@ -509,10 +592,10 @@ export default function App() {
   const selectedDetail =
     selectedSport && selectedRanked
       ? buildRankedDetail(
-          selectedRanked,
-          selectedSport,
-          contradictionMap[selectedRanked.sport],
-        )
+        selectedRanked,
+        selectedSport,
+        contradictionMap[selectedRanked.sport],
+      )
       : selectedSport
         ? buildFallbackDetail(selectedSport)
         : null;
@@ -536,6 +619,7 @@ export default function App() {
     <>
       <ErrorToast message={toast.message} visible={toast.visible} />
 
+
       <div className="nav">
         <div className="nav-left">
           <div className="nav-rings">
@@ -547,23 +631,47 @@ export default function App() {
           </div>
           <span className="nav-wordmark">Road to LA28</span>
         </div>
-        <span className="nav-right">National Momentum Tracker</span>
+        <div className="nav-right-group">
+          <span className="nav-right">Team USA Performance Outlook</span>
+          <button
+            type="button"
+            className={`nav-refresh${isAnalyzing ? ' nav-refresh-busy' : ''}`}
+            onClick={runAnalysis}
+            disabled={isAnalyzing || sportsLoading}
+            aria-label="Refresh Rankings"
+          >
+            {isAnalyzing ? (
+              <><span className="nav-spinner" />Analyzing…</>
+            ) : (
+              <>&#8635; Refresh Rankings</>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="hero">
-        <div className="hero-kicker">Powered by 5 Gemini agents</div>
-        <div className="hero-h">
-          Who&apos;s
-          <br />
-          surging
-          <br />
-          to <em>LA28</em>
+        <div className="hero-content">
+          <div className="hero-kicker">Team USA · Los Angeles 2028 Olympics</div>
+          <div className="hero-h">
+            Which sports
+            <br />
+            look strongest
+            <br />
+            heading into <em>LA28</em>
+          </div>
+          <div className="hero-body">
+            Compare Team USA sports using recent results, press coverage,
+            athlete development, and Paralympic performance.
+          </div>
         </div>
-        <div className="hero-body">
-          Real-time momentum rankings for every Team USA sport — built from world championship
-          data, news signals, and athlete pipeline depth.
-        </div>
+        <img src={usFlag} alt="US Flag" className="hero-image" />
       </div>
+
+      {dataSource === 'fallback' && (
+        <div className="data-banner">
+          Showing baseline data — live analysis pending.
+        </div>
+      )}
 
       <AgentStrip agentState={agentState} />
 

@@ -58,3 +58,12 @@ export function analyzeSport(sportId) {
 export function analyzeAll() {
   return requestJson('/analyze-all', { method: 'POST' });
 }
+
+// ── Cloud Storage fetch — used on page load, zero Gemini calls ────────────────
+const GCS_URL = 'https://storage.googleapis.com/la28-momentum-cache/momentum-data.json';
+
+export async function loadMomentumData() {
+  const res = await fetch(GCS_URL);
+  if (!res.ok) throw new Error('Could not load momentum data');
+  return res.json();
+}

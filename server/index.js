@@ -14,6 +14,8 @@ import { runParalympicParityAgent } from './utils/agents/paralympicParity.js';
 import { runContradictionDetector } from './utils/agents/contradictionDetector.js';
 import { runSynthesisJudge } from './utils/agents/synthesisJudge.js';
 import { runNarrativeAgent } from './utils/agents/narrative.js';
+import { appendScoreHistory, loadAllScoreHistory } from './utils/agentMemory.js';
+import { writeResultsToStorage } from './utils/storage.js';
 
 dotenv.config();
 
@@ -52,6 +54,37 @@ async function readSportsDataset() {
     datasetLabel: dataset.datasetLabel,
     sports: enrichSportsWithScores(dataset.sports),
   };
+}
+
+function getErrorStatus(error) {
+  if (Number.isInteger(error?.status) && error.status >= 400 && error.status < 600) {
+    return error.status;
+  }
+
+  if (Number.isInteger(error?.code) && error.code >= 400 && error.code < 600) {
+    return error.code;
+  }
+
+  const rawMessage = `${error?.message || error || ''}`.toLowerCase();
+  const causeCode = `${error?.cause?.code || ''}`.toLowerCase();
+
+  if (
+    rawMessage.includes('resource_exhausted')
+    || rawMessage.includes('quota')
+    || rawMessage.includes('prepayment credits are depleted')
+  ) {
+    return 429;
+  }
+
+  if (
+    rawMessage.includes('fetch failed')
+    || rawMessage.includes('connect timeout')
+    || causeCode === 'und_err_connect_timeout'
+  ) {
+    return 503;
+  }
+
+  return 500;
 }
 
 app.get('/api/health', (_request, response) => {
@@ -99,7 +132,7 @@ app.post('/api/analyze', async (request, response) => {
       analysis,
     });
   } catch (error) {
-    response.status(500).json({
+    response.status(getErrorStatus(error)).json({
       error: error.message || 'Unable to analyze this sport right now.',
     });
   }
@@ -157,6 +190,11 @@ app.post('/api/analyze-all', async (_request, response) => {
       narrative: narrativeMap[s.sport]?.bracket_narrative || null,
       momentum_emoji_tier: narrativeMap[s.sport]?.momentum_emoji_tier || null,
       para_note: narrativeMap[s.sport]?.para_note || null,
+      headline: narrativeMap[s.sport]?.headline || null,
+      why_watch: narrativeMap[s.sport]?.why_watch || null,
+      momentum_story: narrativeMap[s.sport]?.momentum_story || null,
+      la28_prediction: narrativeMap[s.sport]?.la28_prediction || null,
+      fan_signal: narrativeMap[s.sport]?.fan_signal || null,
     }));
 
     response.json({
@@ -176,9 +214,101 @@ app.post('/api/analyze-all', async (_request, response) => {
     });
   } catch (error) {
     console.error('[analyze-all] error:', error);
-    response.status(500).json({
+    response.status(getErrorStatus(error)).json({
       error: error.message || 'Multi-agent analysis failed.',
     });
+  }
+});
+
+// ── Cron-only orchestration — writes to Cloud Storage ──────────────────────────
+app.post('/api/cron/orchestrate', async (request, response) => {
+  if (process.env.ENABLE_CRON_ORCHESTRATION !== 'true') {
+    response.status(404).json({ error: 'Cron orchestration is disabled.' });
+    return;
+  }
+
+  const secret = request.headers['x-cron-secret'];
+
+  if (!secret || secret !== process.env.CRON_SECRET) {
+    response.status(401).json({ error: 'Unauthorized.' });
+    return;
+  }
+
+  const globalStart = Date.now();
+
+  try {
+    const dataset = await readSportsDataset();
+    const { sports } = dataset;
+
+    await runOrchestrator(sports);
+
+    const [trajectory, sentiment, pipeline, parity] = await Promise.all([
+      runMedalTrajectoryAgent(sports),
+      runNewsSentimentAgent(sports),
+      runPipelineGrowthAgent(sports),
+      runParalympicParityAgent(sports),
+    ]);
+
+    const contradictions = await runContradictionDetector({ trajectory, sentiment, pipeline, parity });
+    const synthesis = await runSynthesisJudge({ trajectory, sentiment, pipeline, parity, contradictions });
+    const narratives = await runNarrativeAgent(synthesis);
+
+    const narrativeMap = {};
+    for (const n of narratives) {
+      narrativeMap[n.sport] = n;
+    }
+
+    const ranked = synthesis.map((s) => ({
+      ...s,
+      narrative: narrativeMap[s.sport]?.bracket_narrative || null,
+      momentum_emoji_tier: narrativeMap[s.sport]?.momentum_emoji_tier || null,
+      para_note: narrativeMap[s.sport]?.para_note || null,
+      headline: narrativeMap[s.sport]?.headline || null,
+      why_watch: narrativeMap[s.sport]?.why_watch || null,
+      momentum_story: narrativeMap[s.sport]?.momentum_story || null,
+      la28_prediction: narrativeMap[s.sport]?.la28_prediction || null,
+      fan_signal: narrativeMap[s.sport]?.fan_signal || null,
+    }));
+
+    await Promise.all(
+      ranked.map(async (sport) => {
+        const trajectoryResult = trajectory.find((entry) => entry.sport === sport.sport);
+        const sentimentResult = sentiment.find((entry) => entry.sport === sport.sport);
+        const pipelineResult = pipeline.find((entry) => entry.sport === sport.sport);
+
+        await appendScoreHistory(
+          sport.sport.toLowerCase().replace(/\s+/g, '_'),
+          sport.sport,
+          {
+            composite_score: sport.composite_score,
+            momentum_tier: sport.momentum_tier,
+            trajectory_score: trajectoryResult?.trajectory_score || null,
+            sentiment_score: sentimentResult?.sentiment_score || null,
+            pipeline_score: pipelineResult?.pipeline_growth_index || null,
+            newArticlesCount: sentimentResult?.new_article_count || 0,
+          },
+        );
+      }),
+    );
+
+    const scoreHistory = await loadAllScoreHistory();
+
+    const result = {
+      ranked,
+      scoreHistory,
+      generatedAt: new Date().toISOString(),
+      agentOutputs: { trajectory, sentiment, pipeline, parity, contradictions },
+      executionMeta: { timingsMs: { total: Date.now() - globalStart } },
+    };
+
+    // RULE 2: Only cron writes to Cloud Storage. Never partial results.
+    await writeResultsToStorage(result);
+
+    console.log(`[cron/orchestrate] success in ${Date.now() - globalStart}ms`);
+    response.json({ success: true, generatedAt: result.generatedAt });
+  } catch (error) {
+    console.error('[cron/orchestrate] error:', error);
+    response.status(getErrorStatus(error)).json({ error: error.message || 'Orchestration failed.' });
   }
 });
 

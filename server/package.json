@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "seed:baseline-cache": "node scripts/seedBaselineCache.js",
+    "update:momentum-cache": "node scripts/updateMomentumCache.js"
   },
   "dependencies": {
+    "@google-cloud/firestore": "^7.9.0",
+    "@google-cloud/storage": "^7.19.0",
     "@google/genai": "^1.17.0",
     "cors": "^2.8.5",
     "dotenv": "^17.0.1",

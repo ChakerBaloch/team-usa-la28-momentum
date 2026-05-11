@@ -13,6 +13,7 @@ The codebase currently includes:
 - Deterministic momentum scoring in `server/utils/score.js`
 - A legacy single-sport Gemini route at `POST /api/analyze`
 - A new multi-agent full-board route at `POST /api/analyze-all`
+- A local machine cache refresh command that writes `momentum-data.json` to Cloud Storage
 - Friendly UI error handling for quota, billing, API enablement, and network failures
 - Google Cloud Run deployment support
 - A GitHub Actions CI/CD workflow scaffold for validation and deploys
@@ -158,6 +159,27 @@ Runs the full multi-agent pipeline and returns:
 - generated narratives
 - execution timing metadata
 
+### Local Cloud Storage Refresh
+
+For now, the deployed cron endpoint is disabled by default. Refresh cached production data from a trusted local machine instead:
+
+```bash
+cd server
+npm run update:momentum-cache
+```
+
+That command runs the full agent pipeline locally and uploads the final result to:
+
+```text
+gs://la28-momentum-cache/momentum-data.json
+```
+
+The script only writes after the full pipeline succeeds. If any agent step fails, it exits without updating the Cloud Storage object.
+
+The local machine needs Gemini credentials and authenticated `gsutil` access to the bucket. It does not require Application Default Credentials.
+
+If the command fails with `429`, Gemini quota was exhausted and the Cloud Storage object was left unchanged. Wait for quota to reset, use a different `GEMINI_MODEL` or API key, or enable billing for the Gemini project before rerunning.
+
 ## How Gemini Is Used
 
 Gemini is used only on the backend. The frontend never calls Gemini directly.
@@ -183,6 +205,7 @@ This project is designed to be simple to demo and simple to deploy:
 
 - Cloud Run hosts the Node.js service
 - Express serves both the API and the production React build
+- Cloud Storage hosts the cached `momentum-data.json` read by the frontend on page load
 - `PORT` is taken from Cloud Run at runtime
 - `GEMINI_API_KEY` is provided through environment variables
 - `GEMINI_MODEL` can be overridden per environment
@@ -321,11 +344,11 @@ team-usa-la28-momentum/
   .gitignore
 ```
 
-## Known Gaps and Deferred Work
+* [ ] Known Gaps and Deferred Work
 
 - Firestore is explicitly skipped for now
 - The local JSON file is still the only source of truth
-- No scheduled ingestion or background refresh jobs exist yet
+- Cloud Scheduler is intentionally not active yet; cache refreshes are run manually from a local machine
 - No SSE or streaming response path is implemented for live agent updates
 - The current dataset is broader, but still not fully parity-balanced across Olympic and Paralympic entries
 - CI validation needs a small refresh to match the expanded dataset
