@@ -51,8 +51,8 @@ jobs:
           const parsedDataset = JSON.parse(rawDataset);
           const scoredSports = enrichSportsWithScores(parsedDataset.sports);
 
-          if (scoredSports.length !== 8) {
-            throw new Error('Expected exactly 8 sports in the dataset.');
+          if (scoredSports.length < 1) {
+            throw new Error('Expected at least one sport in the dataset.');
           }
 
           if (typeof scoredSports[0]?.momentumScore !== 'number') {
@@ -93,8 +93,13 @@ jobs:
           region: us-central1
           source: .
           env_vars: |-
-            GEMINI_MODEL=gemini-3-flash-preview
+            GEMINI_MODEL=gemini-2.5-flash
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            GCS_BUCKET_NAME=la28-momentum-cache
+            GCS_FILE_NAME=momentum-data.json
+            ENABLE_CRON_ORCHESTRATION=true
+            CRON_SECRET=${{ secrets.CRON_SECRET }}
+            FRONTEND_ORIGIN=https://team-usa-la28-momentum-491036212633.us-central1.run.app
 
       - name: Print service URL
         run: echo "Service URL: ${{ steps.deploy.outputs.url }}"

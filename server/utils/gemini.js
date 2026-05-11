@@ -31,6 +31,8 @@ Keep the tone exciting, clear, and fan-friendly.
 Return structured JSON only.
 `.trim();
 
+const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+
 function getClient() {
   const apiKey = process.env.GEMINI_API_KEY;
 
@@ -61,33 +63,88 @@ function parseAnalysisResponse(rawText) {
  * @param {string} agentId - for logging
  * @param {string} promptText - the full agent prompt
  * @param {object} jsonSchema - JSON schema for structured output
- * @param {object} [opts] - optional overrides: { temperature, systemInstruction, model }
+ * @param {object} [opts] - optional overrides: { temperature, systemInstruction, model, maxOutputTokens }
  */
 export async function callAgent(agentId, promptText, jsonSchema, opts = {}) {
   const client = getClient();
-  const model = opts.model || process.env.GEMINI_MODEL || 'gemini-2.5-flash-preview-04-17';
+  const model = opts.model || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
 
-  const response = await client.models.generateContent({
-    model,
-    contents: promptText,
-    config: {
-      systemInstruction: opts.systemInstruction || SYSTEM_INSTRUCTION,
-      responseMimeType: 'application/json',
-      responseJsonSchema: jsonSchema,
-      temperature: opts.temperature ?? 0.5,
-    },
-  });
+  const maxOutputTokens = opts.maxOutputTokens ?? 16384;
 
-  const rawText = response.text;
-  const normalizedText = rawText.trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
-  return JSON.parse(normalizedText);
+  const maxRetries = 3;
+  let attempt = 0;
+
+  while (attempt < maxRetries) {
+    try {
+      let rawText = '';
+      try {
+        const response = await client.models.generateContent({
+          model,
+          contents: promptText,
+          config: {
+            systemInstruction: opts.systemInstruction || SYSTEM_INSTRUCTION,
+            responseMimeType: 'application/json',
+            responseJsonSchema: jsonSchema,
+            temperature: opts.temperature ?? 0.5,
+            maxOutputTokens,
+            thinkingConfig: { thinkingBudget: 0 },
+          },
+        });
+
+        rawText = response.text ?? '';
+        const normalizedText = rawText.trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+        return JSON.parse(normalizedText);
+
+      } catch (err) {
+        if (err instanceof SyntaxError) {
+          console.warn(`[${agentId}] invalid JSON (length ${rawText.length}), retrying with higher token limit`);
+          console.warn(`[${agentId}] response tail: ...${rawText.slice(-200)}`);
+
+          const retryTokens = Math.min(maxOutputTokens * 2, 65536);
+          const retryResponse = await client.models.generateContent({
+            model,
+            contents: promptText,
+            config: {
+              systemInstruction: opts.systemInstruction || SYSTEM_INSTRUCTION,
+              responseMimeType: 'application/json',
+              responseJsonSchema: jsonSchema,
+              temperature: opts.temperature ?? 0.5,
+              maxOutputTokens: retryTokens,
+              thinkingConfig: { thinkingBudget: 0 },
+            },
+          });
+
+          const retryRaw = retryResponse.text ?? '';
+          const retryNorm = retryRaw.trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+
+          try {
+            return JSON.parse(retryNorm);
+          } catch (retryErr) {
+            console.error(`[${agentId}] retry also failed. Response tail: ...${retryRaw.slice(-300)}`);
+            throw new Error(`[${agentId}] Gemini returned invalid JSON after retry: ${retryErr.message}`);
+          }
+        }
+        throw err;
+      }
+    } catch (err) {
+      const isRateLimitOrUnavailable = err.status === 429 || err.status === 503;
+      if (isRateLimitOrUnavailable && attempt < maxRetries - 1) {
+        attempt++;
+        const backoffMs = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+        console.warn(`[${agentId}] API Error ${err.status}, retrying in ${Math.round(backoffMs)}ms (attempt ${attempt}/${maxRetries - 1})`);
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+      } else {
+        throw err;
+      }
+    }
+  }
 }
 
 // ── Legacy single-sport analysis (used by POST /api/analyze) ──────────────────
 
 export async function generateMomentumAnalysis({ sport, datasetLabel }) {
   const client = getClient();
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash-preview-04-17';
+  const model = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
 
   const prompt = `
 Dataset label: ${datasetLabel}
@@ -141,6 +198,7 @@ Writing rules:
       responseMimeType: 'application/json',
       responseJsonSchema: ANALYSIS_SCHEMA,
       temperature: 0.6,
+      maxOutputTokens: 2048,
     },
   });
 
