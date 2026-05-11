@@ -102,4 +102,4 @@ jobs:
             FRONTEND_ORIGIN=https://team-usa-la28-momentum-491036212633.us-central1.run.app
 
       - name: Print service URL
-        run: echo "Service URL: ${{ steps.deploy.outputs.url }}"
+        run: 'echo "Service URL: ${{ steps.deploy.outputs.url }}"'
